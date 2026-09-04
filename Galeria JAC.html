@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galería · Junta de Acción Comunal</title>
+<style>
+  :root{
+    --bg:#F3EFE6;
+    --ink:#22301F;
+    --ink-soft:#5B6B55;
+    --gold:#D9A441;
+    --green:#2F5233;
+    --brick:#B85C38;
+    --header-bg:#1B2A1E;
+    --header-text:#EDE6D2;
+    --card-bg:#FFFFFF;
+    --card-shadow:rgba(34,48,31,0.18);
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+  }
+  /* ---------- Header ---------- */
+  header{
+    background:var(--header-bg);
+    color:var(--header-text);
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:14px 24px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow:0 2px 10px rgba(0,0,0,.25);
+  }
+  header .logo-box{
+    width:48px;height:48px;border-radius:50%;
+    background:var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;flex-shrink:0;
+    border:2px solid rgba(255,255,255,.3);
+  }
+  header .logo-box img{width:100%;height:100%;object-fit:cover;}
+  header .logo-box svg{width:26px;height:26px;}
+  header .titles{display:flex;flex-direction:column;line-height:1.15;}
+  header .titles .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  header .titles h1{
+    font-family:var(--serif);
+    font-size:20px;
+    font-weight:700;
+    margin:2px 0 0;
+    letter-spacing:.01em;
+  }
+  header .spacer{flex:1;}
+  header .home-btn{
+    background:transparent;
+    border:1px solid rgba(237,230,210,.4);
+    color:var(--header-text);
+    font-family:var(--sans);
+    font-size:13px;
+    padding:8px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  header .home-btn:hover{background:rgba(237,230,210,.12);}
+
+  /* ---------- Picker screen ---------- */
+  #picker-screen{
+    min-height:calc(100vh - 76px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px 20px;
+  }
+  #picker-screen .stamp{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--brick);
+    border:1px solid var(--brick);
+    padding:4px 12px;
+    border-radius:20px;
+    margin-bottom:18px;
+  }
+  #picker-screen h2{
+    font-family:var(--serif);
+    font-size:clamp(26px,4vw,38px);
+    max-width:640px;
+    margin:0 0 14px;
+    color:var(--ink);
+  }
+  #picker-screen p{
+    max-width:520px;
+    color:var(--ink-soft);
+    line-height:1.55;
+    margin:0 0 30px;
+    font-size:15px;
+  }
+  #select-btn{
+    background:var(--green);
+    color:#fff;
+    border:none;
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:16px;
+    padding:16px 34px;
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(47,82,51,.35);
+    transition:.15s;
+  }
+  #select-btn:hover{background:#25401F;transform:translateY(-1px);}
+  #picker-screen .hint{
+    margin-top:18px;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-family:var(--mono);
+  }
+  #folder-input{display:none;}
+
+  /* ---------- Breadcrumb ---------- */
+  #breadcrumb-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:16px 24px 4px;
+    flex-wrap:wrap;
+  }
+  .back-btn{
+    background:var(--green);
+    color:#fff;
+    border:none;
+    font-family:var(--sans);
+    font-size:14px;
+    font-weight:600;
+    padding:9px 18px;
+    border-radius:22px;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(47,82,51,.35);
+    transition:background .15s, transform .15s;
+    margin-right:6px;
+    white-space:nowrap;
+  }
+  .back-btn:hover{ background:#25401F; transform:translateX(-2px); }
+
+  #breadcrumb-bar .crumb{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--ink-soft);
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:4px 2px;
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  #breadcrumb-bar .crumb.current{
+    color:var(--ink);
+    font-weight:700;
+    text-decoration:none;
+    cursor:default;
+  }
+  #breadcrumb-bar .sep{color:var(--ink-soft);opacity:.5;}
+  #search-box{
+    margin-left:auto;
+    font-family:var(--sans);
+    font-size:13px;
+    padding:8px 12px;
+    border-radius:20px;
+    border:1px solid #cfc7b3;
+    background:#fff;
+    min-width:180px;
+  }
+
+  /* ---------- Grid ---------- */
+  #grid{
+    padding:8px 24px 60px;
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+  }
+  .empty-msg{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+    font-family:var(--serif);
+    font-size:18px;
+  }
+
+  /* ---------- Section headers ---------- */
+  .section-title{
+    grid-column:1/-1;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    border-bottom:1px solid #ddd3ba;
+    padding-bottom:8px;
+    margin-top:6px;
+  }
+  .section-title:first-child{margin-top:0;}
+
+  .folders-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:22px;
+    margin-bottom:8px;
+  }
+  .files-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+    gap:20px;
+  }
+
+  .folder-card{
+    background:var(--header-bg);
+    border-radius:10px;
+    padding:18px 18px 16px;
+    cursor:pointer;
+    box-shadow:0 4px 10px var(--card-shadow);
+    transition:transform .15s, box-shadow .15s;
+    min-height:148px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    border-top:5px solid var(--gold);
+  }
+  .folder-card:hover{transform:translateY(-3px);box-shadow:0 8px 18px var(--card-shadow);}
+  .folder-card .folder-icon{
+    font-size:26px;
+    line-height:1;
+  }
+  .folder-card .label{
+    color:var(--header-text);
+    font-family:var(--serif);
+    font-size:17px;
+    font-weight:700;
+    line-height:1.35;
+  }
+  .folder-card .count{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:400;
+    color:var(--gold);
+    display:block;
+    margin-top:auto;
+    padding-top:6px;
+  }
+
+  .media-card{
+    background:var(--card-bg);
+    border-radius:4px;
+    padding:8px 8px 12px;
+    box-shadow:0 4px 10px var(--card-shadow);
+    cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+    display:flex;
+    flex-direction:column;
+    content-visibility:auto;
+    contain-intrinsic-size:210px 250px;
+  }
+  .media-card:nth-child(3n+1){transform:rotate(-1.1deg);}
+  .media-card:nth-child(3n+2){transform:rotate(0.8deg);}
+  .media-card:nth-child(3n){transform:rotate(-0.4deg);}
+  .media-card:hover{transform:rotate(0deg) translateY(-4px) scale(1.02);box-shadow:0 10px 20px var(--card-shadow);z-index:2;}
+  .media-card .thumb-wrap{
+    width:100%;aspect-ratio:1/1;
+    background:#e8e2d2;
+    border-radius:2px;
+    overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .media-card img{width:100%;height:100%;object-fit:cover;display:block;}
+  .media-card .video-badge{
+    position:absolute;
+    top:6px;right:6px;
+    background:rgba(27,42,30,.85);
+    color:#fff;
+    border-radius:50%;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;
+  }
+  .media-card .fname{
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--ink-soft);
+    margin-top:8px;
+    text-align:center;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  /* ---------- Lightbox ---------- */
+  #lightbox{
+    position:fixed;inset:0;
+    background:rgba(15,20,14,.94);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;
+  }
+  #lightbox[hidden]{display:none;}
+  #lightbox .stage{
+    max-width:88vw;max-height:82vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #lightbox img, #lightbox video{
+    max-width:88vw;max-height:82vh;
+    border-radius:4px;
+    box-shadow:0 10px 40px rgba(0,0,0,.6);
+  }
+  #lightbox .caption{
+    position:absolute;bottom:22px;left:0;right:0;
+    text-align:center;
+    color:#EDE6D2;
+    font-family:var(--mono);
+    font-size:12px;
+  }
+  #lightbox .lb-btn{
+    position:absolute;
+    top:50%;transform:translateY(-50%);
+    background:rgba(237,230,210,.12);
+    border:1px solid rgba(237,230,210,.3);
+    color:#EDE6D2;
+    width:46px;height:46px;
+    border-radius:50%;
+    font-size:20px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #lightbox .lb-btn:hover{background:rgba(237,230,210,.25);}
+  #lb-prev{left:18px;}
+  #lb-next{right:18px;}
+  #lb-close{
+    position:absolute;top:18px;right:22px;
+    background:none;border:none;
+    color:#EDE6D2;font-size:28px;
+    cursor:pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .folder-card,.media-card{transition:none;}
+    .media-card{transform:none !important;}
+  }
+
+  @media(max-width:520px){
+    #grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;padding:12px;}
+    header{padding:10px 14px;}
+    #search-box{width:100%;margin-left:0;order:99;}
+  }
+
+  /* Corrige que display:flex/grid propios ganaban al atributo [hidden] */
+  #picker-screen[hidden],
+  #grid[hidden],
+  #breadcrumb-bar[hidden]{ display:none; }
+
+  /* ---------- Hero / portada ---------- */
+  #hero{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:30px 70px 26px;
+  }
+  #hero[hidden]{display:none;}
+  .hero-content{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    flex:0 1 560px;
+    max-width:560px;
+  }
+
+  /* Racimo triangular: una foto arriba y dos abajo, separadas */
+  .hero-collage{
+    position:relative;
+    flex:0 0 450px;
+    width:450px;
+    height:460px;
+  }
+  .collage-img{
+    position:absolute;
+    width:215px;
+    height:215px;
+    border-radius:12px;
+    overflow:hidden;
+    background:#e8e2d2;
+    box-shadow:0 10px 26px var(--card-shadow);
+    transition:transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s;
+    cursor:pointer;
+  }
+  .collage-img img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    transition:transform .6s cubic-bezier(.2,.8,.3,1);
+  }
+  .collage-img:hover{
+    /* 215px -> ~250px */
+    transform:scale(1.163) rotate(0deg);
+    box-shadow:0 22px 48px rgba(34,48,31,.35);
+    z-index:9;
+  }
+  .collage-img:hover img{ transform:scale(1.12); }
+
+  .hero-collage .c1{ top:0;     left:117px; transform:rotate(-3deg); }
+  .hero-collage .c2{ top:240px; left:0;     transform:rotate(2deg);  }
+  .hero-collage .c3{ top:240px; left:235px; transform:rotate(-2deg); }
+
+  .hero-logo{
+    width:350px;height:350px;
+    border-radius:50%;
+    background:var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    border:6px solid var(--card-bg);
+    box-shadow:0 12px 36px var(--card-shadow);
+    margin-bottom:12px;
+  }
+  .hero-logo img{width:100%;height:100%;object-fit:cover;}
+  .hero-logo svg{width:100px;height:100px;}
+  .hero-eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--brick);
+  }
+  .hero-title{
+    font-family:var(--serif);
+    font-size:clamp(26px,4vw,36px);
+    margin:6px 0 12px;
+    color:var(--ink);
+  }
+  .hero-text{
+    max-width:560px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    font-size:15px;
+    white-space:pre-line;
+  }
+
+  /* ---------- Destacados (banner rotativo) ---------- */
+  #destacados{
+    position:relative;
+    margin:0 24px 26px;
+    border-radius:16px;
+    overflow:hidden;
+    height:440px;
+    background:var(--header-bg);
+    box-shadow:0 12px 30px var(--card-shadow);
+  }
+  #destacados[hidden]{display:none;}
+  .dest-viewport{position:absolute;inset:0;}
+  .dest-slide{
+    position:absolute;inset:0;
+    display:flex;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .8s ease;
+  }
+  .dest-slide.active{opacity:1;visibility:visible;}
+  .dest-slide .dest-photo{
+    position:absolute;inset:0;
+  }
+  .dest-slide .dest-photo img{
+    width:100%;height:100%;object-fit:cover;object-position:center 22%;display:block;
+    transform:scale(1.04);
+  }
+  .dest-slide.active .dest-photo img{
+    animation:destZoom 9s ease-out both;
+  }
+  @keyframes destZoom{
+    from{ transform:scale(1.04); }
+    to{ transform:scale(1.14); }
+  }
+  .dest-slide .dest-veil{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg, rgba(20,32,22,.94) 0%, rgba(20,32,22,.82) 42%, rgba(20,32,22,.15) 78%, rgba(20,32,22,0) 100%);
+  }
+  .dest-text{
+    position:relative;
+    align-self:center;
+    max-width:520px;
+    padding:0 40px;
+    color:var(--header-text);
+  }
+  .dest-slide.active .dest-text{ animation:heroIn .8s ease-out both; }
+  .dest-tag{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--header-bg);
+    background:var(--gold);
+    padding:4px 12px;
+    border-radius:20px;
+    margin-bottom:12px;
+  }
+  .dest-title{
+    font-family:var(--serif);
+    font-size:clamp(22px,2.6vw,32px);
+    line-height:1.2;
+    margin:0 0 10px;
+  }
+  .dest-body{
+    font-size:15px;
+    line-height:1.6;
+    color:#D7D2C0;
+    margin:0;
+  }
+  .dest-nav{
+    position:absolute;
+    top:50%;transform:translateY(-50%);
+    width:42px;height:42px;
+    border-radius:50%;
+    border:1px solid rgba(237,230,210,.35);
+    background:rgba(20,32,22,.55);
+    color:var(--header-text);
+    font-size:22px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    z-index:4;
+    transition:background .2s;
+  }
+  .dest-nav:hover{background:rgba(20,32,22,.85);}
+  #dest-prev{left:14px;}
+  #dest-next{right:14px;}
+  .dest-dots{
+    position:absolute;
+    bottom:16px;right:24px;
+    display:flex;gap:8px;
+    z-index:4;
+  }
+  .dest-dot{
+    width:9px;height:9px;
+    border-radius:50%;
+    border:none;
+    background:rgba(237,230,210,.4);
+    cursor:pointer;
+    padding:0;
+    transition:background .2s, width .2s;
+  }
+  .dest-dot.active{background:var(--gold);width:26px;border-radius:5px;}
+
+  @media(max-width:760px){
+    #destacados{height:400px;margin:0 12px 20px;}
+    .dest-slide .dest-veil{
+      background:linear-gradient(0deg, rgba(20,32,22,.96) 30%, rgba(20,32,22,.55) 70%, rgba(20,32,22,.25) 100%);
+    }
+    .dest-text{align-self:flex-end;padding:0 22px 46px;max-width:100%;}
+    .dest-nav{display:none;}
+    .dest-dots{left:22px;right:auto;bottom:18px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .dest-slide.active .dest-photo img,
+    .dest-slide.active .dest-text{ animation:none; }
+    .dest-slide{ transition:none; }
+  }
+
+  /* Entrada suave al abrir la portada */
+  @keyframes heroIn{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  /* Las fotos solo hacen fade: si animáramos su transform, perderían
+     la inclinación del collage y el efecto al pasar el mouse. */
+  @keyframes fadeIn{
+    from{ opacity:0; }
+    to{ opacity:1; }
+  }
+  #hero .hero-content{ animation:heroIn .7s ease-out both; }
+  #hero .c1{ animation:fadeIn .8s ease-out .10s both; }
+  #hero .c2{ animation:fadeIn .8s ease-out .24s both; }
+  #hero .c3{ animation:fadeIn .8s ease-out .38s both; }
+
+  @media (prefers-reduced-motion: reduce){
+    #hero .hero-content, #hero .c1, #hero .c2, #hero .c3{ animation:none; }
+    .collage-img, .collage-img img{ transition:none; }
+  }
+
+  @media(max-width:1500px){
+    #hero{ padding:30px 36px 26px; }
+    .hero-collage{ flex-basis:370px; width:370px; height:385px; }
+    .collage-img{ width:178px; height:178px; }
+    .hero-collage .c1{ left:96px; }
+    .hero-collage .c2{ top:200px; left:0; }
+    .hero-collage .c3{ top:200px; left:192px; }
+    .hero-logo{ width:300px; height:300px; }
+  }
+  @media(max-width:1200px){
+    .hero-collage{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-box" id="logo-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1B2A1E" stroke-width="1.6"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-6h6v6"/></svg>
+  </div>
+  <div class="titles">
+    <span class="eyebrow">Junta de Acción Comunal · Moravia 2</span>
+    <h1>Galería de la Comunidad</h1>
+  </div>
+  <div class="spacer"></div>
+  <button class="home-btn" id="home-btn" hidden>⌂ Inicio</button>
+</header>
+
+<div id="picker-screen">
+  <span class="stamp">Archivo comunitario 2022 – 2026</span>
+  <h2>Selecciona la carpeta de la USB para empezar a mirar las fotos y videos</h2>
+  <p>Si tienes el archivo "Iniciar Galeria.bat", ábrelo mejor a ese: entra directo, sin este paso. Esta pantalla es solo para cuando se abre "Galeria JAC.html" por su cuenta.</p>
+  <button id="select-btn">📂 Seleccionar carpeta de la USB</button>
+  <input type="file" id="folder-input" webkitdirectory directory multiple>
+  <div class="hint">Funciona mejor en Google Chrome o Microsoft Edge.</div>
+</div>
+
+<section id="hero" hidden>
+  <div class="hero-collage hero-collage-left">
+    <div class="collage-img c1"><img src="portada/portada1.jpg" alt="Entrega de premios a la comunidad" loading="lazy"></div>
+    <div class="collage-img c2"><img src="portada/portada2.jpg" alt="Fiesta de los niños" loading="lazy"></div>
+    <div class="collage-img c3"><img src="portada/portada3.jpg" alt="Actividad con el colegio en el parque" loading="lazy"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-logo" id="hero-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1B2A1E" stroke-width="1.4"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-6h6v6"/></svg>
+    </div>
+    <span class="hero-eyebrow">Junta de Acción Comunal · Moravia 2</span>
+    <h2 class="hero-title">Historia del barrio</h2>
+    <p class="hero-text" id="historia-text"></p>
+  </div>
+  <div class="hero-collage hero-collage-right">
+    <div class="collage-img c1"><img src="portada/portada4.jpg" alt="Actividad de disfraces con los niños" loading="lazy"></div>
+    <div class="collage-img c2"><img src="portada/portada5.jpg" alt="Novenas de aguinaldos" loading="lazy"></div>
+    <div class="collage-img c3"><img src="portada/portada6.jpg" alt="Celebración comunitaria en la calle" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="destacados" hidden>
+  <div class="dest-viewport" id="dest-viewport"></div>
+  <button class="dest-nav" id="dest-prev" aria-label="Anterior">‹</button>
+  <button class="dest-nav" id="dest-next" aria-label="Siguiente">›</button>
+  <div class="dest-dots" id="dest-dots"></div>
+</section>
+
+<div id="breadcrumb-bar" hidden></div>
+<div id="grid" hidden></div>
+
+<div id="lightbox" hidden>
+  <button id="lb-close">✕</button>
+  <button class="lb-btn" id="lb-prev">‹</button>
+  <div class="stage" id="lb-stage"></div>
+  <button class="lb-btn" id="lb-next">›</button>
+  <div class="caption" id="lb-caption"></div>
+</div>
+
+<script src="galeria-datos.js" onerror="window.__galeriaDatosMissing = true;"></script>
+<script>
+  // Edita este texto con la historia del barrio: se muestra en la portada.
+  // ==========================================================
+  //  HISTORIA DEL BARRIO
+  //  Cambia el texto de abajo por la historia real del barrio.
+  //  Deja una línea en blanco entre párrafos.
+  // ==========================================================
+  const HISTORIA_TEXTO = `El barrio Moravia 2 hace parte de la UPZ Timiza, en la localidad octava de Kennedy, un territorio que en tiempos prehispánicos los muiscas llamaron Techotiba, "territorio de agua", por los humedales que todavía lo rodean.
+
+Como muchos barrios de Kennedy, Moravia 2 se levantó con el esfuerzo de sus propias familias, que fueron consiguiendo poco a poco las calles, los servicios y los espacios comunes. El 4 de septiembre de 1994 la Junta de Acción Comunal recibió su personería jurídica número 362, y desde entonces ha sido la encargada de gestionar obras, cuidar el parque y mantener vivos los lazos entre vecinos.
+
+Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obras, las fiestas, las jornadas de aseo y las celebraciones que han hecho del barrio lo que es hoy.`;
+
+  // ==========================================================
+  //  DESTACADOS: el banner que va rotando solo en la portada.
+  //  Puedes cambiar el título, el texto o la foto de cada uno,
+  //  y agregar o quitar bloques { ... } de la lista.
+  // ==========================================================
+  const DESTACADOS = [
+    {
+      etiqueta: "Obras",
+      titulo: "El salón comunal, hecho realidad",
+      texto: "Después de años de gestión de la Junta, el barrio consiguió su propio salón comunal: un espacio para las reuniones, las celebraciones y las actividades de todos los vecinos.",
+      foto: "portada/banner1.jpg"
+    },
+    {
+      etiqueta: "Niños",
+      titulo: "La fiesta de los niños",
+      texto: "Cada octubre el parque se llena de disfraces, pintucaritas y juegos. Una de las celebraciones más esperadas del barrio, organizada por la Junta junto con las familias.",
+      foto: "portada/banner2.jpg"
+    },
+    {
+      etiqueta: "Tradición",
+      titulo: "Novenas de aguinaldos",
+      texto: "En diciembre las novenas reúnen a niños, jóvenes y adultos mayores alrededor del pesebre, manteniendo viva una de las tradiciones más queridas de Moravia 2.",
+      foto: "portada/banner3.jpg"
+    },
+    {
+      etiqueta: "Diciembre",
+      titulo: "La cuadra se vuelve pesebre",
+      texto: "Con las luces encendidas y las sillas puestas en plena calle, la novena convierte al barrio entero en un solo punto de encuentro: vecinos de todas las edades esperando la Navidad juntos.",
+      foto: "portada/banner4.jpg"
+    }
+  ];
+</script>
+<script>
+(function(){
+  const IMG_EXT = /\.(jpe?g|png|gif|webp|bmp|heic)$/i;
+  const VID_EXT = /\.(mp4|mov|avi|mkv|webm|m4v)$/i;
+
+  const pickerScreen = document.getElementById('picker-screen');
+  const selectBtn = document.getElementById('select-btn');
+  const folderInput = document.getElementById('folder-input');
+  const breadcrumbBar = document.getElementById('breadcrumb-bar');
+  const grid = document.getElementById('grid');
+  const homeBtn = document.getElementById('home-btn');
+  const logoBox = document.getElementById('logo-box');
+  const hero = document.getElementById('hero');
+  const heroLogo = document.getElementById('hero-logo');
+  const destSection = document.getElementById('destacados');
+  const destViewport = document.getElementById('dest-viewport');
+  const destDots = document.getElementById('dest-dots');
+  let destIndex = 0;
+  let destTimer = null;
+  const historiaText = document.getElementById('historia-text');
+  if (historiaText) historiaText.textContent = (typeof HISTORIA_TEXTO !== 'undefined') ? HISTORIA_TEXTO : '';
+
+  const lightbox = document.getElementById('lightbox');
+  const lbStage = document.getElementById('lb-stage');
+  const lbCaption = document.getElementById('lb-caption');
+  const lbClose = document.getElementById('lb-close');
+  const lbPrev = document.getElementById('lb-prev');
+  const lbNext = document.getElementById('lb-next');
+
+  let root = null;          // tree root
+  let pathStack = [];        // array of folder names from root to current
+  let lazyObserver = null;   // observador para cargar miniaturas al hacer scroll
+  let currentItems = [];     // media items shown in current lightbox context
+  let currentIndex = 0;
+
+  selectBtn.addEventListener('click', () => folderInput.click());
+
+  folderInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    const hasPath = files.some(f => f.webkitRelativePath);
+    if (!hasPath) {
+      alert('Por favor selecciona una CARPETA (no un archivo individual).');
+      return;
+    }
+    const { tree, logoFile } = buildTree(files);
+    root = tree;
+    if (logoFile) {
+      const url = URL.createObjectURL(logoFile);
+      logoBox.innerHTML = `<img src="${url}" alt="Logo JAC">`;
+      heroLogo.innerHTML = `<img src="${url}" alt="Logo JAC">`;
+    }
+    pathStack = [];
+    pickerScreen.hidden = true;
+    breadcrumbBar.hidden = false;
+    grid.hidden = false;
+    homeBtn.hidden = false;
+    buildDestacados();
+    render();
+  });
+
+  homeBtn.addEventListener('click', () => { pathStack = []; render(); });
+
+  function encodePath(p){
+    return p.split('/').map(encodeURIComponent).join('/');
+  }
+
+  // Foto de pantalla completa (para el visor grande / lightbox)
+  function fullUrl(item){
+    return item.file ? URL.createObjectURL(item.file) : encodePath(item.path);
+  }
+
+  // Miniatura liviana para la cuadrícula: usa la versión pequeña generada
+  // por generar_datos.py (carpeta .miniaturas) si existe; si no, cae de vuelta
+  // a la foto original.
+  function thumbUrl(item){
+    if (item.file) return URL.createObjectURL(item.file);
+    return encodePath(item.thumb || item.path);
+  }
+
+  function findLogoPath(node){
+    for (const f of node.files){
+      if (/logo/i.test(f.name)) return f;
+    }
+    for (const key in node.folders){
+      const found = findLogoPath(node.folders[key]);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  function startFromData(data){
+    root = data;
+    const logoItem = findLogoPath(root);
+    if (logoItem){
+      logoBox.innerHTML = `<img src="${thumbUrl(logoItem)}" alt="Logo JAC">`;
+      heroLogo.innerHTML = `<img src="${thumbUrl(logoItem)}" alt="Logo JAC">`;
+    }
+    pathStack = [];
+    pickerScreen.hidden = true;
+    breadcrumbBar.hidden = false;
+    grid.hidden = false;
+    homeBtn.hidden = false;
+    buildDestacados();
+    render();
+  }
+
+  // Auto-arranque: si "generar_datos.ps1" ya generó galeria-datos.js,
+  // se salta la pantalla de selección y entra directo, como un programa.
+  if (window.GALERIA_DATA){
+    startFromData(window.GALERIA_DATA);
+  }
+
+  function buildTree(fileList){
+    const root = { name:'', folders:{}, files:[] };
+    let logoFile = null;
+    for (const file of fileList){
+      const rel = file.webkitRelativePath || file.name;
+      const parts = rel.split('/');
+      const pathParts = parts.slice(1); // drop the selected root folder's own name
+      if (pathParts.length === 0) continue;
+      const fileName = pathParts[pathParts.length - 1];
+      if (!logoFile && /logo/i.test(fileName)) logoFile = file;
+      let node = root;
+      for (let i=0;i<pathParts.length-1;i++){
+        const folderName = pathParts[i];
+        if (!node.folders[folderName]){
+          node.folders[folderName] = { name:folderName, folders:{}, files:[] };
+        }
+        node = node.folders[folderName];
+      }
+      if (IMG_EXT.test(fileName)){
+        node.files.push({ file, name: fileName, type:'image' });
+      } else if (VID_EXT.test(fileName)){
+        node.files.push({ file, name: fileName, type:'video' });
+      }
+    }
+    return { tree: root, logoFile };
+  }
+
+  function currentNode(){
+    let node = root;
+    for (const name of pathStack){
+      node = node.folders[name];
+      if (!node) return root;
+    }
+    return node;
+  }
+
+  function countMedia(node){
+    let c = node.files.length;
+    for (const key in node.folders) c += countMedia(node.folders[key]);
+    return c;
+  }
+
+  // ---------- Banner de destacados ----------
+  function buildDestacados(){
+    if (!destSection || typeof DESTACADOS === 'undefined' || !DESTACADOS.length) return;
+    destViewport.innerHTML = '';
+    destDots.innerHTML = '';
+
+    DESTACADOS.forEach((d, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'dest-slide' + (i === 0 ? ' active' : '');
+      slide.innerHTML = `
+        <div class="dest-photo"><img src="${d.foto}" alt="${escapeHtml(d.titulo)}" loading="lazy"></div>
+        <div class="dest-veil"></div>
+        <div class="dest-text">
+          ${d.etiqueta ? `<span class="dest-tag">${escapeHtml(d.etiqueta)}</span>` : ''}
+          <h3 class="dest-title">${escapeHtml(d.titulo)}</h3>
+          <p class="dest-body">${escapeHtml(d.texto)}</p>
+        </div>`;
+      destViewport.appendChild(slide);
+
+      const dot = document.createElement('button');
+      dot.className = 'dest-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Ver ' + d.titulo);
+      dot.addEventListener('click', () => showDest(i, true));
+      destDots.appendChild(dot);
+    });
+
+    startDestTimer();
+  }
+
+  function showDest(i, manual){
+    const slides = destViewport.querySelectorAll('.dest-slide');
+    const dots = destDots.querySelectorAll('.dest-dot');
+    if (!slides.length) return;
+    destIndex = (i + slides.length) % slides.length;
+    slides.forEach((s, n) => s.classList.toggle('active', n === destIndex));
+    dots.forEach((d, n) => d.classList.toggle('active', n === destIndex));
+    if (manual) startDestTimer();
+  }
+
+  function startDestTimer(){
+    clearInterval(destTimer);
+    destTimer = setInterval(() => showDest(destIndex + 1, false), 7000);
+  }
+
+  const destPrev = document.getElementById('dest-prev');
+  const destNext = document.getElementById('dest-next');
+  if (destPrev) destPrev.addEventListener('click', () => showDest(destIndex - 1, true));
+  if (destNext) destNext.addEventListener('click', () => showDest(destIndex + 1, true));
+  // Se pausa mientras la persona está leyendo con el mouse encima.
+  if (destSection){
+    destSection.addEventListener('mouseenter', () => clearInterval(destTimer));
+    destSection.addEventListener('mouseleave', startDestTimer);
+  }
+
+  function render(){
+    const enInicio = pathStack.length === 0;
+    hero.hidden = !enInicio;
+    if (destSection) destSection.hidden = !enInicio;
+    renderBreadcrumb();
+    renderGrid();
+  }
+
+  function renderBreadcrumb(){
+    breadcrumbBar.innerHTML = '';
+
+    // Botón "Atrás": solo aparece cuando estamos dentro de una carpeta.
+    if (pathStack.length > 0){
+      const back = document.createElement('button');
+      back.className = 'back-btn';
+      back.innerHTML = '‹ Atrás';
+      back.title = 'Volver a la carpeta anterior';
+      back.addEventListener('click', () => {
+        pathStack.pop();
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      breadcrumbBar.appendChild(back);
+    }
+
+    const makeCrumb = (label, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'crumb' + (idx === pathStack.length - 1 && idx !== -1 ? ' current' : '');
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        pathStack = idx === -1 ? [] : pathStack.slice(0, idx + 1);
+        render();
+      });
+      return btn;
+    };
+    breadcrumbBar.appendChild(makeCrumb('Inicio', -1));
+    pathStack.forEach((name, idx) => {
+      const sep = document.createElement('span');
+      sep.className = 'sep';
+      sep.textContent = '›';
+      breadcrumbBar.appendChild(sep);
+      breadcrumbBar.appendChild(makeCrumb(name, idx));
+    });
+    const search = document.createElement('input');
+    search.id = 'search-box';
+    search.placeholder = 'Buscar en esta carpeta…';
+    search.addEventListener('input', () => filterGrid(search.value));
+    breadcrumbBar.appendChild(search);
+  }
+
+  function filterGrid(term){
+    const t = term.trim().toLowerCase();
+    grid.querySelectorAll('[data-name]').forEach(el => {
+      const match = el.getAttribute('data-name').toLowerCase().includes(t);
+      el.style.display = match ? '' : 'none';
+    });
+  }
+
+  function renderGrid(){
+    grid.innerHTML = '';
+    if (lazyObserver){ lazyObserver.disconnect(); lazyObserver = null; }
+    const lazyTargets = [];
+    const node = currentNode();
+    const folderNames = Object.keys(node.folders).sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+    const files = node.files.filter(f => !/logo/i.test(f.name)).sort((a,b)=>a.name.localeCompare(b.name,'es',{numeric:true}));
+
+    if (folderNames.length === 0 && files.length === 0){
+      const msg = document.createElement('div');
+      msg.className = 'empty-msg';
+      msg.textContent = 'Esta carpeta está vacía.';
+      grid.appendChild(msg);
+      return;
+    }
+
+    if (folderNames.length){
+      const title = document.createElement('div');
+      title.className = 'section-title';
+      title.textContent = 'Carpetas';
+      grid.appendChild(title);
+
+      const foldersGrid = document.createElement('div');
+      foldersGrid.className = 'folders-grid';
+      folderNames.forEach(name => {
+        const child = node.folders[name];
+        const card = document.createElement('div');
+        card.className = 'folder-card';
+        card.setAttribute('data-name', name);
+        const total = countMedia(child);
+        card.innerHTML = `
+          <span class="folder-icon">🗂️</span>
+          <div class="label">${escapeHtml(name)}</div>
+          <span class="count">${total} archivo${total===1?'':'s'}</span>
+        `;
+        card.addEventListener('click', () => { pathStack.push(name); render(); });
+        foldersGrid.appendChild(card);
+      });
+      grid.appendChild(foldersGrid);
+    }
+
+    currentItems = files;
+    if (files.length){
+      const title = document.createElement('div');
+      title.className = 'section-title';
+      title.textContent = 'Fotos y videos';
+      grid.appendChild(title);
+
+      const filesGrid = document.createElement('div');
+      filesGrid.className = 'files-grid';
+      files.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'media-card';
+        card.setAttribute('data-name', item.name);
+        const thumbWrap = document.createElement('div');
+        thumbWrap.className = 'thumb-wrap';
+        if (item.type === 'image'){
+          const img = document.createElement('img');
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.alt = item.name;
+          thumbWrap.appendChild(img);
+          lazyTargets.push({ el: img, item });
+        } else {
+          // No cargamos el video para la miniatura (eso es lo que iba lento);
+          // solo se abre el video real al hacer clic.
+          const placeholder = document.createElement('div');
+          placeholder.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:34px;';
+          placeholder.textContent = '🎬';
+          thumbWrap.appendChild(placeholder);
+          const badge = document.createElement('div');
+          badge.className = 'video-badge';
+          badge.textContent = '▶';
+          thumbWrap.appendChild(badge);
+        }
+        const fname = document.createElement('div');
+        fname.className = 'fname';
+        fname.textContent = item.name;
+        card.appendChild(thumbWrap);
+        card.appendChild(fname);
+        card.addEventListener('click', () => openLightbox(idx));
+        filesGrid.appendChild(card);
+      });
+      grid.appendChild(filesGrid);
+    }
+
+    if (lazyTargets.length){
+      lazyObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting){
+            const target = lazyTargets.find(t => t.el === entry.target);
+            if (target && !target.el.src){
+              target.el.src = thumbUrl(target.item);
+            }
+            lazyObserver.unobserve(entry.target);
+          }
+        });
+      }, { root:null, rootMargin:'300px 0px' });
+      lazyTargets.forEach(t => lazyObserver.observe(t.el));
+    }
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function openLightbox(idx){
+    currentIndex = idx;
+    lightbox.hidden = false;
+    showLightboxItem();
+  }
+
+  function showLightboxItem(){
+    const item = currentItems[currentIndex];
+    if (!item) return;
+    lbStage.innerHTML = '';
+    const url = fullUrl(item);
+    if (item.type === 'image'){
+      const img = document.createElement('img');
+      img.src = url;
+      lbStage.appendChild(img);
+    } else {
+      const vid = document.createElement('video');
+      vid.src = url;
+      vid.controls = true;
+      vid.autoplay = true;
+      lbStage.appendChild(vid);
+    }
+    lbCaption.textContent = `${item.name}  ·  ${currentIndex + 1} / ${currentItems.length}`;
+  }
+
+  function closeLightbox(){
+    lightbox.hidden = true;
+    lbStage.innerHTML = '';
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  lbPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + currentItems.length) % currentItems.length; showLightboxItem(); });
+  lbNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % currentItems.length; showLightboxItem(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (lightbox.hidden){
+      // Con el visor cerrado, Retroceso o Esc suben una carpeta.
+      const escribiendo = /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName);
+      if (!escribiendo && (e.key === 'Backspace' || e.key === 'Escape') && pathStack.length > 0){
+        e.preventDefault();
+        pathStack.pop();
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lbPrev.click();
+    if (e.key === 'ArrowRight') lbNext.click();
+  });
+})();
+</script>
+</body>
+</html>
