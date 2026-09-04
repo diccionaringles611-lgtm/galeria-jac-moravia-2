@@ -780,10 +780,11 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
     grid.hidden = false;
     homeBtn.hidden = false;
     buildDestacados();
+    history.replaceState({ stack: [] }, '');
     render();
   });
 
-  homeBtn.addEventListener('click', () => { pathStack = []; render(); });
+  homeBtn.addEventListener('click', () => { irA([]); });
 
   function encodePath(p){
     return p.split('/').map(encodeURIComponent).join('/');
@@ -826,6 +827,7 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
     grid.hidden = false;
     homeBtn.hidden = false;
     buildDestacados();
+    history.replaceState({ stack: [] }, '');
     render();
   }
 
@@ -931,6 +933,44 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
     destSection.addEventListener('mouseleave', startDestTimer);
   }
 
+  // ---------- Navegación con el historial del navegador ----------
+  // Sin esto, el botón "atrás" del celular cierra la página entera
+  // en vez de volver a la carpeta anterior.
+  function irA(nuevoStack, push){
+    pathStack = nuevoStack.slice();
+    if (push !== false){
+      history.pushState({ stack: pathStack.slice() }, '');
+    }
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function volverAtras(){
+    // Delegamos en el historial para que coincida con el botón del navegador.
+    if (history.state && history.state.stack && history.state.stack.length > 0){
+      history.back();
+    } else if (pathStack.length > 0){
+      irA(pathStack.slice(0, -1));
+    }
+  }
+
+  window.addEventListener('popstate', (e) => {
+    const st = e.state || {};
+    // Si estaba abierto el visor de fotos, el "atrás" solo lo cierra.
+    if (!lightbox.hidden){
+      closeLightbox();
+      if (st.lb === undefined) return;
+    }
+    if (st.lb !== undefined){
+      pathStack = (st.stack || []).slice();
+      render();
+      openLightbox(st.lb, false);
+      return;
+    }
+    pathStack = (st.stack || []).slice();
+    render();
+  });
+
   function render(){
     const enInicio = pathStack.length === 0;
     hero.hidden = !enInicio;
@@ -948,11 +988,7 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
       back.className = 'back-btn';
       back.innerHTML = '‹ Atrás';
       back.title = 'Volver a la carpeta anterior';
-      back.addEventListener('click', () => {
-        pathStack.pop();
-        render();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
+      back.addEventListener('click', volverAtras);
       breadcrumbBar.appendChild(back);
     }
 
@@ -961,8 +997,7 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
       btn.className = 'crumb' + (idx === pathStack.length - 1 && idx !== -1 ? ' current' : '');
       btn.textContent = label;
       btn.addEventListener('click', () => {
-        pathStack = idx === -1 ? [] : pathStack.slice(0, idx + 1);
-        render();
+        irA(idx === -1 ? [] : pathStack.slice(0, idx + 1));
       });
       return btn;
     };
@@ -1024,7 +1059,7 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
           <div class="label">${escapeHtml(name)}</div>
           <span class="count">${total} archivo${total===1?'':'s'}</span>
         `;
-        card.addEventListener('click', () => { pathStack.push(name); render(); });
+        card.addEventListener('click', () => { irA(pathStack.concat([name])); });
         foldersGrid.appendChild(card);
       });
       grid.appendChild(foldersGrid);
@@ -1095,10 +1130,25 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
     return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function openLightbox(idx){
+  function openLightbox(idx, push){
     currentIndex = idx;
     lightbox.hidden = false;
     showLightboxItem();
+    // Guardamos un paso en el historial: así el "atrás" del celular
+    // cierra la foto en vez de salirse de la galería.
+    if (push !== false){
+      history.pushState({ stack: pathStack.slice(), lb: idx }, '');
+    }
+  }
+
+  function cerrarVisor(){
+    // Si el visor se abrió empujando historial, retrocedemos para
+    // no dejar pasos sueltos acumulados.
+    if (history.state && history.state.lb !== undefined){
+      history.back();
+    } else {
+      closeLightbox();
+    }
   }
 
   function showLightboxItem(){
@@ -1125,8 +1175,8 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
     lbStage.innerHTML = '';
   }
 
-  lbClose.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  lbClose.addEventListener('click', cerrarVisor);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) cerrarVisor(); });
   lbPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + currentItems.length) % currentItems.length; showLightboxItem(); });
   lbNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % currentItems.length; showLightboxItem(); });
 
@@ -1136,13 +1186,11 @@ Esta galería reúne el registro fotográfico de ese trabajo colectivo: las obra
       const escribiendo = /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName);
       if (!escribiendo && (e.key === 'Backspace' || e.key === 'Escape') && pathStack.length > 0){
         e.preventDefault();
-        pathStack.pop();
-        render();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        volverAtras();
       }
       return;
     }
-    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'Escape') cerrarVisor();
     if (e.key === 'ArrowLeft') lbPrev.click();
     if (e.key === 'ArrowRight') lbNext.click();
   });
