@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://diccionaringles611-lgtm.github.io/galeria-jac-moravia-2/sitemap.xml
